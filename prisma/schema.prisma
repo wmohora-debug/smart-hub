@@ -1,0 +1,213 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  RESTAURANT_OWNER
+  MANAGER
+  STAFF
+}
+
+model Restaurant {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  name             String
+  tagline          String?
+  description      String?  @db.Text
+  longDescription  String?  @db.Text
+  logo             String?
+  banner           String?
+  favicon          String?
+  themeColor       String?  @default("#D97706")
+  address          String?  @db.Text
+  city             String?
+  state            String?
+  country          String?
+  postalCode       String?
+  phone            String?
+  whatsapp         String?
+  email            String?
+  website          String?
+  openingTime      String?  @default("10:00 AM")
+  closingTime      String?  @default("10:30 PM")
+  autoOpen         Boolean  @default(true)
+  isOverrideClosed Boolean  @default(false)
+  prepTime         String?  @default("15-20 min")
+  deliveryTime     String?  @default("30-45 min")
+  facebookUrl      String?
+  instagramUrl     String?
+  twitterUrl       String?
+  youtubeUrl       String?
+  googleMapsUrl    String?
+  metaTitle        String?
+  metaDescription  String?
+  keywords         String?
+  currency         String   @default("INR")
+  timezone         String   @default("Asia/Kolkata")
+  openingHours     Json?
+  theme            Json?
+  isActive         Boolean  @default(true)
+  isDeleted        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  categories Category[]
+  menuItems  MenuItem[]
+  adminUsers AdminUser[]
+  settings   RestaurantSettings?
+  auditLogs  AuditLog[]
+  tables     Table[]
+
+  @@index([slug])
+  @@index([isActive, isDeleted])
+  @@map("restaurants")
+}
+
+model Category {
+  id           String   @id @default(cuid())
+  restaurantId String
+  name         String
+  description  String?  @db.Text
+  image        String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  menuItems  MenuItem[]
+
+  @@index([restaurantId])
+  @@index([restaurantId, displayOrder])
+  @@index([restaurantId, isActive, isDeleted])
+  @@map("categories")
+}
+
+model MenuItem {
+  id            String   @id @default(cuid())
+  restaurantId  String
+  categoryId    String
+  name          String
+  description   String   @db.Text
+  price         Decimal  @db.Decimal(10, 2)
+  image         String?
+  isVeg         Boolean  @default(true)
+  isChefSpecial Boolean  @default(false)
+  isPopular     Boolean  @default(false)
+  isSoldOut     Boolean  @default(false)
+  displayOrder  Int      @default(0)
+  isActive      Boolean  @default(true)
+  isDeleted     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  category   Category   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId])
+  @@index([categoryId])
+  @@index([restaurantId, categoryId, displayOrder])
+  @@index([restaurantId, isActive, isDeleted])
+  @@map("menu_items")
+}
+
+model AdminUser {
+  id           String    @id @default(cuid())
+  restaurantId String?
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(MANAGER)
+  isActive     Boolean   @default(true)
+  isDeleted    Boolean   @default(false)
+  lastLogin    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  restaurant Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([restaurantId])
+  @@map("admin_users")
+}
+
+model RestaurantSettings {
+  id            String   @id @default(cuid())
+  restaurantId  String   @unique
+  taxRate       Decimal  @default(5.00) @db.Decimal(5, 2)
+  serviceCharge Decimal  @default(0.00) @db.Decimal(5, 2)
+  currency      String   @default("INR")
+  themeConfig   Json?
+  brandingJson  Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId])
+  @@map("restaurant_settings")
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  restaurantId String?
+  action       String
+  entity       String
+  entityId     String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  restaurant Restaurant? @relation(fields: [restaurantId], references: [id], onDelete: SetNull)
+
+  @@index([restaurantId])
+  @@index([action])
+  @@map("audit_logs")
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  restaurantId String?
+  filename     String
+  url          String
+  folder       String   @default("general")
+  mimeType     String
+  size         Int
+  width        Int?
+  height       Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([restaurantId])
+  @@index([folder])
+  @@map("media_assets")
+}
+
+model Table {
+  id           String   @id @default(cuid())
+  restaurantId String
+  name         String
+  tableNumber  Int
+  capacity     Int      @default(2)
+  zone         String?  @default("Main Dining")
+  notes        String?  @db.Text
+  slug         String   @unique
+  qrCodeImage  String?  @db.Text
+  isActive     Boolean  @default(true)
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, tableNumber])
+  @@index([restaurantId])
+  @@index([slug])
+  @@index([restaurantId, isActive, isDeleted])
+  @@map("tables")
+}
