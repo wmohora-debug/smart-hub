@@ -1,6 +1,6 @@
-import fs from "fs/promises";
 import path from "path";
 import crypto from "crypto";
+import { put, del } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 import { MediaRepository } from "@/repositories/media.repository";
 
@@ -43,24 +43,22 @@ export class MediaService {
       ? folderName.toLowerCase()
       : "general";
 
-    // 4. Unique Filename Generation (timestamp + random hex + extension)
+    // 4. Unique Pathname Generation (folder/timestamp-randomHex.ext)
     const randomHex = crypto.randomBytes(8).toString("hex");
     const safeFilename = `${sanitizedFolder}-${Date.now()}-${randomHex}${ext}`;
+    const blobPathname = `${sanitizedFolder}/${safeFilename}`;
 
-    // 5. Ensure Upload Directory Exists
-    const uploadDir = path.join(process.cwd(), "public", "uploads", sanitizedFolder);
-    await fs.mkdir(uploadDir, { recursive: true });
+    // 5. Upload to Vercel Blob Storage
+    const blob = await put(blobPathname, fileBuffer, {
+      access: "public",
+      contentType: mimeType,
+    });
 
-    // 6. Write File to Disk
-    const filePath = path.join(uploadDir, safeFilename);
-    await fs.writeFile(filePath, fileBuffer);
-
-    // 7. Save MediaAsset metadata in PostgreSQL
-    const publicUrl = `/uploads/${sanitizedFolder}/${safeFilename}`;
+    // 6. Save MediaAsset metadata in PostgreSQL with public Vercel Blob URL
     return MediaRepository.create({
       restaurantId,
       filename: originalFilename,
-      url: publicUrl,
+      url: blob.url,
       folder: sanitizedFolder,
       mimeType,
       size: fileBuffer.length,
@@ -106,13 +104,12 @@ export class MediaService {
       );
     }
 
-    // Unlink physical file from disk if local
-    if (asset.url.startsWith("/uploads/")) {
-      const localFilePath = path.join(process.cwd(), "public", asset.url);
+    // Delete file from Vercel Blob storage if it's a Vercel Blob URL
+    if (asset.url.startsWith("http://") || asset.url.startsWith("https://")) {
       try {
-        await fs.unlink(localFilePath);
+        await del(asset.url);
       } catch {
-        // Silently continue if physical file is already removed
+        // Silently continue if blob is already removed or during local test
       }
     }
 
