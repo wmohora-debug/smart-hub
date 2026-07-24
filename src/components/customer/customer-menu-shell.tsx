@@ -6,9 +6,7 @@ import { CategoryEntity, MenuItemEntity, RestaurantEntity } from "@/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useTable } from "@/context/table-context";
 import {
-  RestaurantHeader,
   HeroBanner,
-  SearchSection,
   CategoryNavigation,
   MenuCategorySection,
   BottomBillBar,
@@ -238,19 +236,12 @@ export function CustomerMenuShell({
         </div>
       )}
 
-      {/* Dynamic Restaurant Header */}
-      <RestaurantHeader restaurant={initialRestaurant} />
-
-      {/* Dynamic Hero Cover Banner */}
-      <HeroBanner restaurant={initialRestaurant} />
-
-      {/* Controlled Search Section with ID for top scroll targeting */}
-      <div id="search-section">
-        <SearchSection
-          value={rawSearchQuery}
-          onChange={(query) => setRawSearchQuery(query)}
-        />
-      </div>
+      {/* Unified Full-Width Hero Banner with Floating Search */}
+      <HeroBanner
+        restaurant={initialRestaurant}
+        searchQuery={rawSearchQuery}
+        onSearchChange={(query) => setRawSearchQuery(query)}
+      />
 
       {/* Sticky Category Navigation */}
       <CategoryNavigation
