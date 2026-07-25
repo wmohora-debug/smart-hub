@@ -1,4 +1,6 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, OrderStatus, PaymentStatus } from "@prisma/client";
+
+export { OrderStatus, PaymentStatus };
 
 export interface RestaurantEntity {
   id: string;
@@ -126,6 +128,47 @@ export interface AuditLogEntity {
   entityId?: string | null;
   metadata?: Prisma.JsonValue | null;
   createdAt: Date;
+}
+
+export interface OrderItemEntity {
+  id: string;
+  orderId: string;
+  menuItemId?: string | null;
+  name: string;
+  price: number;
+  quantity: number;
+  totalPrice: number;
+  notes?: string | null;
+  createdAt: Date;
+}
+
+export interface OrderEntity {
+  id: string;
+  restaurantId: string;
+  tableId?: string | null;
+  orderNumber: string;
+  customerName?: string | null;
+  customerPhone?: string | null;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  paymentMethod?: string | null;
+  subtotal: number;
+  taxRate: number;
+  taxAmount: number;
+  serviceCharge: number;
+  serviceChargeAmount: number;
+  totalAmount: number;
+  notes?: string | null;
+  cancellationReason?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  items?: OrderItemEntity[];
+  table?: {
+    id: string;
+    name: string;
+    tableNumber: number;
+    zone?: string | null;
+  } | null;
 }
 
 export interface CartItem {

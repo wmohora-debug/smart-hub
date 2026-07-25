@@ -15,14 +15,19 @@ export default function AdminLoginPage() {
   const searchParams = useSearchParams();
   const fromPath = searchParams.get("from") || "/admin/dashboard";
 
-  const [email, setEmail] = React.useState("admin@legourmet.com");
-  const [password, setPassword] = React.useState("admin123");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
   const [rememberMe, setRememberMe] = React.useState(true);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim() || !password) {
+      setError("Email and password are required.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -30,7 +35,7 @@ export default function AdminLoginPage() {
       const res = await fetch("/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, rememberMe }),
+        body: JSON.stringify({ email: email.trim(), password, rememberMe }),
       });
 
       const data = await res.json();
@@ -82,7 +87,7 @@ export default function AdminLoginPage() {
                 id="email"
                 type="email"
                 required
-                placeholder="admin@legourmet.com"
+                placeholder="admin@smarttechfoodhub.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="h-10 text-xs sm:text-sm"
@@ -126,12 +131,6 @@ export default function AdminLoginPage() {
               {loading ? "Authenticating..." : "Sign In to Admin Portal"}
             </Button>
           </form>
-
-          <div className="border-t pt-3 text-center">
-            <p className="text-[11px] text-muted-foreground">
-              Demo Credentials: <code className="bg-muted px-1.5 py-0.5 rounded text-foreground font-mono">admin@legourmet.com</code> / <code className="bg-muted px-1.5 py-0.5 rounded text-foreground font-mono">admin123</code>
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

@@ -5,17 +5,18 @@ import { SlideIn } from "@/components/shared/motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Icons } from "@/components/shared/icons";
-import { notify } from "@/components/ui/toast-wrapper";
 import { cn } from "@/lib/utils";
 
 export interface BottomBillBarProps {
   itemCount: number;
   estimatedTotal: number;
+  onViewOrder?: () => void;
 }
 
 export function BottomBillBar({
   itemCount,
   estimatedTotal,
+  onViewOrder,
 }: BottomBillBarProps) {
   const isEnabled = itemCount > 0;
   const prevCount = React.useRef(itemCount);
@@ -84,11 +85,7 @@ export function BottomBillBar({
             "rounded-full px-6 font-semibold shadow-md shadow-primary/25 gap-2 hover:scale-[1.02] active:scale-95 transition-all duration-200 disabled:opacity-40 disabled:hover:scale-100",
             justAdded && "animate-pulse-subtle scale-105",
           )}
-          onClick={() =>
-            notify.success(
-              `Table Order Summary: ${itemCount} items, ₹${estimatedTotal.toLocaleString("en-IN")}`,
-            )
-          }
+          onClick={onViewOrder}
         >
           <span>View Table Order</span>
           <Icons.chevronRight className="h-4 w-4" />

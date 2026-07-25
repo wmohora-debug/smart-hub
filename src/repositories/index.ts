@@ -6,3 +6,4 @@ export * from "./admin-user.repository";
 export * from "./dashboard.repository";
 export * from "./media.repository";
 export * from "./table.repository";
+export * from "./order.repository";

@@ -6,3 +6,4 @@ export * from "./auth.service";
 export * from "./dashboard.service";
 export * from "./media.service";
 export * from "./table.service";
+export * from "./order.service";

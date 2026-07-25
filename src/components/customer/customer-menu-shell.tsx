@@ -12,6 +12,7 @@ import {
   BottomBillBar,
   ScrollProgressBar,
   BackToTopButton,
+  CheckoutDrawer,
 } from "@/components/customer";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Container } from "@/components/ui/layout";
@@ -38,6 +39,7 @@ export function CustomerMenuShell({
 
   const [activeCategory, setActiveCategory] = React.useState("all");
   const [cartItems, setCartItems] = React.useState<Record<string, number>>({});
+  const [isCheckoutOpen, setIsCheckoutOpen] = React.useState(false);
   const isUserClickScrolling = React.useRef(false);
 
   // Auto-detect and validate ?table=<slug> query parameter
@@ -292,7 +294,23 @@ export function CustomerMenuShell({
       <BackToTopButton />
 
       {/* Dynamic Sticky Bottom Bill Bar */}
-      <BottomBillBar itemCount={totalItems} estimatedTotal={totalPrice} />
+      <BottomBillBar
+        itemCount={totalItems}
+        estimatedTotal={totalPrice}
+        onViewOrder={() => setIsCheckoutOpen(true)}
+      />
+
+      {/* Customer Checkout Modal */}
+      <CheckoutDrawer
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        cartItems={cartItems}
+        dishes={initialDishes}
+        restaurant={initialRestaurant}
+        onIncrement={handleIncrement}
+        onDecrement={handleDecrement}
+        onClearCart={() => setCartItems({})}
+      />
     </main>
   );
 }

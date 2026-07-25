@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, OrderStatus } from "@prisma/client";
 
 export interface CreateRestaurantDTO {
   slug: string;
@@ -110,3 +110,35 @@ export interface CreateTableDTO {
 export type UpdateTableDTO = Partial<Omit<CreateTableDTO, "restaurantId">> & {
   isActive?: boolean;
 };
+
+export interface CreateOrderItemInput {
+  menuItemId: string;
+  quantity: number;
+  notes?: string;
+}
+
+export interface CreateOrderDTO {
+  restaurantId: string;
+  tableId?: string;
+  customerName?: string;
+  customerPhone?: string;
+  paymentMethod?: string;
+  notes?: string;
+  items: CreateOrderItemInput[];
+}
+
+export interface UpdateOrderStatusDTO {
+  status: OrderStatus;
+  cancellationReason?: string;
+}
+
+export interface OrderFilterDTO {
+  restaurantId?: string;
+  tableId?: string;
+  status?: OrderStatus;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  limit?: number;
+}

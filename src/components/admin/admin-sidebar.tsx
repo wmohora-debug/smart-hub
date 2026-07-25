@@ -16,13 +16,12 @@ export interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { title: "Dashboard", href: "/admin/dashboard", icon: "folderOpen" },
+  { title: "Orders", href: "/admin/orders", icon: "folderOpen" },
   { title: "Restaurant", href: "/admin/restaurant", icon: "info" },
   { title: "Categories", href: "/admin/categories", icon: "folderOpen" },
   { title: "Menu Items", href: "/admin/menu-items", icon: "plus" },
   { title: "Tables & QR", href: "/admin/tables", icon: "copy" },
   { title: "Media Library", href: "/admin/media", icon: "copy" },
-  { title: "Settings", href: "/admin/settings", icon: "info", comingSoon: true },
-  { title: "Audit Logs", href: "/admin/audit-logs", icon: "checkCircle", comingSoon: true },
 ];
 
 export function AdminSidebar() {

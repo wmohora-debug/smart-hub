@@ -13,3 +13,4 @@ export * from "./restaurant-header";
 export * from "./scroll-progress-bar";
 export * from "./search-section";
 export * from "./veg-indicator";
+export * from "./checkout-drawer";

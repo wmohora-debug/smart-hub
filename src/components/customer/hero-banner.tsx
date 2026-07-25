@@ -24,8 +24,7 @@ export function HeroBanner({
   const displayName = restaurant?.name || "Smart Tech Food Hub";
   const displayTagline =
     restaurant?.tagline ||
-    restaurant?.description ||
-    "Premium Artisanal Digital Menu & Culinary Bistro";
+    "Freshly prepared fast food, snacks, and refreshing drinks";
   const displayLocation =
     restaurant?.address ||
     [restaurant?.city, restaurant?.state, restaurant?.postalCode].filter(Boolean).join(", ") ||
@@ -34,15 +33,6 @@ export function HeroBanner({
   const isCurrentlyOpen = restaurant?.isOverrideClosed
     ? false
     : restaurant?.isActive ?? true;
-
-  const headline =
-    restaurant?.metaTitle ||
-    `${displayName} — ${restaurant?.tagline || "Culinary Bistro"}`;
-
-  const description =
-    restaurant?.metaDescription ||
-    restaurant?.description ||
-    "Explore our hand-crafted menu prepared by master chefs using organic, locally sourced ingredients.";
 
   const prepTime = restaurant?.prepTime || "15-20 min";
   const deliveryTime = restaurant?.deliveryTime || "30-45 min";
@@ -75,12 +65,9 @@ export function HeroBanner({
           <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-zinc-900 to-black z-0" />
         )}
 
-        {/* Multi-layer Overlays for Maximum Contrast & Michelin Aesthetic */}
-        {/* Layer 1: Base Dark Opacity */}
+        {/* Multi-layer Overlays for Maximum Contrast */}
         <div className="absolute inset-0 bg-black/45 z-[1]" />
-        {/* Layer 2: Left-to-Right Subtle Gradient */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/35 z-[2]" />
-        {/* Layer 3: Bottom Fade Transition */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-black/20 to-transparent z-[3]" />
 
         {/* HERO INNER CONTENT */}
@@ -90,7 +77,6 @@ export function HeroBanner({
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               {/* Logo & Name */}
               <div className="flex items-center gap-3.5 sm:gap-4">
-                {/* Restaurant Logo: 64px Desktop / 52px Mobile */}
                 <div className="relative flex h-13 w-13 md:h-16 md:w-16 shrink-0 items-center justify-center rounded-full border-2 border-white/80 bg-black/60 shadow-lg shadow-black/40 overflow-hidden backdrop-blur-md">
                   {restaurant?.logo ? (
                     <Image
@@ -110,10 +96,9 @@ export function HeroBanner({
                 <div>
                   <div className="flex items-center gap-2.5 flex-wrap">
                     <h1 className="text-xl sm:text-2xl md:text-3xl font-serif font-bold tracking-tight text-white drop-shadow-md">
-                      {displayName}
+                      Smart Tech Food Hub
                     </h1>
 
-                    {/* Status Badge: Glassmorphism with Dot */}
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[11px] font-medium shadow-sm">
                       <span className="relative flex h-2 w-2">
                         <span
@@ -187,15 +172,15 @@ export function HeroBanner({
                 variant="outline"
                 className="border-white/30 bg-black/40 text-white text-[10px] sm:text-[11px] px-3 py-0.5 font-semibold tracking-wider uppercase rounded-full backdrop-blur-md"
               >
-                Culinary Excellence
+                Fresh & Delicious
               </Badge>
 
               <h2 className="text-lg sm:text-xl md:text-2xl font-serif font-bold text-white tracking-tight leading-tight">
-                {headline}
+                Smart Tech Food Hub
               </h2>
 
               <p className="text-xs sm:text-sm text-white/85 max-w-xl leading-relaxed font-normal line-clamp-2 sm:line-clamp-none">
-                {description}
+                Enjoy freshly prepared fast food, snacks, and refreshing drinks made with quality ingredients.
               </p>
 
               <div className="pt-1 flex flex-wrap items-center gap-4 text-xs font-medium text-white/90">

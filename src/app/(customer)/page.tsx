@@ -4,6 +4,7 @@ import { CustomerMenuShell } from "@/components/customer";
 import { CategoryEntity, MenuItemEntity, RestaurantEntity } from "@/types";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function CustomerPage() {
   let restaurant: RestaurantEntity | null = null;

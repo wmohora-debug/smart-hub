@@ -4,18 +4,17 @@ import { DashboardService } from "@/services/dashboard.service";
 import { StatsCard } from "@/components/admin/stats-card";
 import { QuickActions } from "@/components/admin/quick-actions";
 import { Badge } from "@/components/ui/badge";
-import { Icons } from "@/components/shared/icons";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
   const session = await getSession();
   let stats = {
-    restaurantName: "Le Gourmet Bistro",
-    categoryCount: 7,
-    menuItemCount: 42,
-    popularCount: 12,
-    chefSpecialCount: 8,
+    restaurantName: "Smart Tech Food Hub",
+    categoryCount: 0,
+    menuItemCount: 0,
+    popularCount: 0,
+    chefSpecialCount: 0,
   };
 
   try {
@@ -46,7 +45,7 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* Real Statistics Grid */}
+      {/* Statistics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Menu Categories"
@@ -80,59 +79,6 @@ export default async function AdminDashboardPage() {
           Quick Admin Actions
         </h3>
         <QuickActions />
-      </div>
-
-      {/* Activity & Status Overview Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
-        {/* System Activity Placeholder */}
-        <div className="lg:col-span-2 rounded-2xl border bg-card p-6 space-y-4 shadow-subtle">
-          <div className="flex items-center justify-between border-b pb-3">
-            <h4 className="font-serif font-bold text-base text-foreground">
-              Recent Activity Audit Log
-            </h4>
-            <span className="text-xs text-muted-foreground font-medium">Audit System Placeholder</span>
-          </div>
-
-          <div className="space-y-3 text-xs text-muted-foreground">
-            <div className="flex items-center justify-between py-2 border-b border-border/40">
-              <div className="flex items-center gap-2">
-                <Icons.checkCircle className="h-4 w-4 text-success" />
-                <span className="font-medium text-foreground">Restaurant Menu Initialized</span>
-              </div>
-              <span>Just now</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-border/40">
-              <div className="flex items-center gap-2">
-                <Icons.info className="h-4 w-4 text-primary" />
-                <span className="font-medium text-foreground">Enterprise Schema Migrated</span>
-              </div>
-              <span>Sprint 08</span>
-            </div>
-          </div>
-        </div>
-
-        {/* System Status Card */}
-        <div className="rounded-2xl border bg-card p-6 space-y-4 shadow-subtle">
-          <div className="border-b pb-3">
-            <h4 className="font-serif font-bold text-base text-foreground">
-              System Operational Status
-            </h4>
-          </div>
-          <div className="space-y-3 text-xs">
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Database Engine</span>
-              <span className="font-bold text-success">PostgreSQL Active</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">Auth Security</span>
-              <span className="font-bold text-success">HttpOnly Cookies</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">RBAC Engine</span>
-              <span className="font-bold text-primary">Enforced</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
