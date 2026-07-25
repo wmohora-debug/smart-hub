@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { CategoryEntity, MenuItemEntity, RestaurantEntity } from "@/types";
+import { CategoryEntity, MenuItemEntity, OrderEntity, OrderStatus, RestaurantEntity } from "@/types";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useTable } from "@/context/table-context";
 import {
@@ -16,7 +17,7 @@ import {
 } from "@/components/customer";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Container } from "@/components/ui/layout";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/shared/icons";
 
 export interface CustomerMenuShellProps {
@@ -32,7 +33,7 @@ export function CustomerMenuShell({
 }: CustomerMenuShellProps) {
   const searchParams = useSearchParams();
   const tableSlugParam = searchParams.get("table");
-  const { isTableSelected, tableName, zone, setTableData, clearTable } = useTable();
+  const { isTableSelected, tableName, zone, setTableData } = useTable();
 
   const [rawSearchQuery, setRawSearchQuery] = React.useState("");
   const debouncedSearchQuery = useDebounce(rawSearchQuery, 250);
@@ -41,6 +42,51 @@ export function CustomerMenuShell({
   const [cartItems, setCartItems] = React.useState<Record<string, number>>({});
   const [isCheckoutOpen, setIsCheckoutOpen] = React.useState(false);
   const isUserClickScrolling = React.useRef(false);
+
+  // Active Order Tracking State
+  const [activeOrder, setActiveOrder] = React.useState<OrderEntity | null>(null);
+
+  // Poll / Check active order status from localStorage
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const checkActiveOrder = async () => {
+      const activeOrderId = localStorage.getItem("active_order_id");
+      if (!activeOrderId) {
+        setActiveOrder(null);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/v1/orders/${activeOrderId}`);
+        const data = await res.json();
+
+        if (data.success && data.data) {
+          const ord: OrderEntity = data.data;
+          const isTerminal =
+            ord.status === OrderStatus.COMPLETED ||
+            ord.status === OrderStatus.CANCELLED ||
+            ord.status === OrderStatus.REJECTED;
+
+          if (isTerminal) {
+            localStorage.removeItem("active_order_id");
+            setActiveOrder(null);
+          } else {
+            setActiveOrder(ord);
+          }
+        } else {
+          localStorage.removeItem("active_order_id");
+          setActiveOrder(null);
+        }
+      } catch {
+        // Ignore fetch errors
+      }
+    };
+
+    checkActiveOrder();
+    const interval = setInterval(checkActiveOrder, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Auto-detect and validate ?table=<slug> query parameter
   React.useEffect(() => {
@@ -117,7 +163,7 @@ export function CustomerMenuShell({
     [filteredDishes],
   );
 
-  // 4. Categories to Display (All active categories maintained in DOM for smooth scrolling)
+  // 4. Categories to Display
   const visibleCategories = React.useMemo(() => {
     if (debouncedSearchQuery.trim()) {
       return initialCategories.filter((c) => getCategoryItemCount(c.id) > 0);
@@ -149,7 +195,7 @@ export function CustomerMenuShell({
     }, 800);
   }, []);
 
-  // 6. Native IntersectionObserver to Auto-Update Active Category Chip while Scrolling
+  // 6. Native IntersectionObserver
   React.useEffect(() => {
     if (debouncedSearchQuery.trim()) return;
 
@@ -167,13 +213,11 @@ export function CustomerMenuShell({
       },
     );
 
-    // Observe all category section targets
     initialCategories.forEach((category) => {
       const element = document.getElementById(category.id);
       if (element) observer.observe(element);
     });
 
-    // Observe top search section to auto-highlight "all" when scrolled to top
     const searchSection = document.getElementById("search-section");
     const topObserver = new IntersectionObserver(
       (entries) => {
@@ -224,21 +268,39 @@ export function CustomerMenuShell({
                 Dining at <span className="font-bold underline">{tableName}</span> ({zone || "Main Dining"})
               </span>
             </div>
-
-            <Badge
-              variant="outline"
-              onClick={clearTable}
-              className="cursor-pointer border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/20 text-[10px] py-0.5 px-2"
-              title="Change or clear assigned dining table"
-            >
-              <Icons.copy className="h-3 w-3 mr-1" />
-              Change Table
-            </Badge>
           </div>
         </div>
       )}
 
-      {/* Unified Full-Width Hero Banner with Floating Search */}
+      {/* Active Order Track Banner */}
+      {activeOrder && (
+        <div className="bg-emerald-600 text-white py-2.5 px-4 shadow-md z-30 sticky top-0 border-b border-emerald-500">
+          <div className="mx-auto max-w-3xl flex items-center justify-between text-xs font-semibold">
+            <div className="flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white" />
+              </span>
+              <span>
+                Active Order <span className="font-bold">{activeOrder.orderNumber}</span> • Status: <span className="uppercase font-extrabold">{activeOrder.status}</span>
+              </span>
+            </div>
+
+            <Link href={`/order-status/${activeOrder.id}`}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 text-[11px] font-bold border-white/40 text-white bg-white/10 hover:bg-white/20 px-3 rounded-full gap-1"
+              >
+                <span>Track Order</span>
+                <Icons.chevronRight className="h-3.5 w-3.5" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Unified Full-Width Hero Banner */}
       <HeroBanner
         restaurant={initialRestaurant}
         searchQuery={rawSearchQuery}

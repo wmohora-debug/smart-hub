@@ -36,9 +36,9 @@ export class OrderService {
   static async createOrder(dto: CreateOrderDTO) {
     const validated = createOrderSchema.parse(dto);
 
-    // Fetch restaurant settings for tax and service charge rates
+    // Fetch restaurant settings for service charge rate (GST removed)
     const settings = await SettingsRepository.findByRestaurantId(validated.restaurantId);
-    const taxRate = settings ? Number(settings.taxRate) : 5.0;
+    const taxRate = 0.0;
     const serviceCharge = settings ? Number(settings.serviceCharge) : 0.0;
 
     // Validate items and snapshot current prices & names
@@ -72,9 +72,9 @@ export class OrderService {
     );
 
     subtotal = roundToTwoDecimals(subtotal);
-    const taxAmount = roundToTwoDecimals(subtotal * (taxRate / 100));
+    const taxAmount = 0.0;
     const serviceChargeAmount = roundToTwoDecimals(subtotal * (serviceCharge / 100));
-    const totalAmount = roundToTwoDecimals(subtotal + taxAmount + serviceChargeAmount);
+    const totalAmount = roundToTwoDecimals(subtotal + serviceChargeAmount);
 
     // Generate unique order number
     const orderNumber = `#ORD-${Date.now().toString().slice(-6)}`;

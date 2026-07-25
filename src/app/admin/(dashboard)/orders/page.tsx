@@ -446,10 +446,6 @@ export default function AdminOrdersPage() {
                   <span>Subtotal</span>
                   <span className="font-semibold text-foreground">₹{activeOrder.subtotal.toLocaleString("en-IN")}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>GST Tax ({activeOrder.taxRate}%)</span>
-                  <span className="font-semibold text-foreground">₹{activeOrder.taxAmount.toLocaleString("en-IN")}</span>
-                </div>
                 {activeOrder.serviceCharge > 0 && (
                   <div className="flex justify-between">
                     <span>Service Charge ({activeOrder.serviceCharge}%)</span>

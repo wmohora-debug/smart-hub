@@ -33,8 +33,23 @@ export function OrderStatusView({ orderId, initialOrder }: OrderStatusViewProps)
       const res = await fetch(`/api/v1/orders/${orderId}`);
       const data = await res.json();
       if (data.success && data.data) {
-        setOrder(data.data);
+        const fetchedOrder: OrderEntity = data.data;
+        setOrder(fetchedOrder);
         setLastUpdated(new Date());
+
+        // Manage localStorage active_order_id persistence
+        if (typeof window !== "undefined") {
+          const terminal =
+            fetchedOrder.status === OrderStatus.COMPLETED ||
+            fetchedOrder.status === OrderStatus.CANCELLED ||
+            fetchedOrder.status === OrderStatus.REJECTED;
+
+          if (terminal) {
+            localStorage.removeItem("active_order_id");
+          } else {
+            localStorage.setItem("active_order_id", fetchedOrder.id);
+          }
+        }
       }
     } catch {
       // Ignore polling errors
@@ -190,10 +205,6 @@ export function OrderStatusView({ orderId, initialOrder }: OrderStatusViewProps)
             <div className="flex justify-between">
               <span>Subtotal</span>
               <span className="font-semibold text-foreground">₹{Number(order.subtotal).toLocaleString("en-IN")}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>GST Tax ({Number(order.taxRate)}%)</span>
-              <span className="font-semibold text-foreground">₹{Number(order.taxAmount).toLocaleString("en-IN")}</span>
             </div>
             {Number(order.serviceCharge) > 0 && (
               <div className="flex justify-between">

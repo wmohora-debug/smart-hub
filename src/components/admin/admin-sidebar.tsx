@@ -26,6 +26,43 @@ const NAV_ITEMS: NavItem[] = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const [unreadOrdersCount, setUnreadOrdersCount] = React.useState(0);
+
+  // Poll pending orders for new notification badge
+  const fetchPendingOrders = React.useCallback(async () => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const res = await fetch("/api/v1/orders?status=PENDING&limit=50");
+      const data = await res.json();
+
+      if (data.success && Array.isArray(data.data)) {
+        const pendingOrders = data.data;
+        const lastViewedTimeStr = localStorage.getItem("last_viewed_orders_time");
+        const lastViewedTime = lastViewedTimeStr ? parseInt(lastViewedTimeStr, 10) : 0;
+
+        // If currently on orders page, mark all viewed
+        if (pathname === "/admin/orders") {
+          localStorage.setItem("last_viewed_orders_time", Date.now().toString());
+          setUnreadOrdersCount(0);
+        } else {
+          // Count pending orders created after last viewed timestamp
+          const newOrders = pendingOrders.filter(
+            (o: { createdAt: string }) => new Date(o.createdAt).getTime() > lastViewedTime,
+          );
+          setUnreadOrdersCount(newOrders.length);
+        }
+      }
+    } catch {
+      // Ignore background fetch errors
+    }
+  }, [pathname]);
+
+  React.useEffect(() => {
+    fetchPendingOrders();
+    const interval = setInterval(fetchPendingOrders, 10000);
+    return () => clearInterval(interval);
+  }, [fetchPendingOrders]);
 
   return (
     <aside className="hidden lg:flex w-64 flex-col border-r bg-card/80 backdrop-blur-xl min-h-screen">
@@ -49,6 +86,7 @@ export function AdminSidebar() {
         {NAV_ITEMS.map((item) => {
           const IconComponent = Icons[item.icon] || Icons.folderOpen;
           const isActive = pathname === item.href;
+          const isOrders = item.href === "/admin/orders";
 
           return (
             <Link
@@ -65,15 +103,17 @@ export function AdminSidebar() {
                 <IconComponent className="h-4 w-4 shrink-0" />
                 <span>{item.title}</span>
               </div>
-              {item.comingSoon && (
+
+              {/* Order Notification Badge */}
+              {isOrders && unreadOrdersCount > 0 && (
                 <Badge
-                  variant="outline"
+                  variant="destructive"
                   className={cn(
-                    "text-[9px] px-1.5 py-0 font-normal border-border/60",
-                    isActive ? "border-primary-foreground/30 text-primary-foreground" : "text-muted-foreground",
+                    "text-[10px] px-1.5 py-0.5 font-bold animate-pulse shadow-sm",
+                    isActive && "bg-white text-destructive font-black border-none",
                   )}
                 >
-                  Soon
+                  {unreadOrdersCount} NEW
                 </Badge>
               )}
             </Link>

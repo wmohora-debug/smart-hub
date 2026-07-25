@@ -60,17 +60,15 @@ export function CheckoutDrawer({
       .filter((entry): entry is { dish: MenuItemEntity; quantity: number } => entry !== null);
   }, [cartItems, dishes]);
 
-  // Financial Calculations
-  const taxRate = restaurant?.settings?.taxRate ?? 5;
+  // Financial Calculations (NO GST / Tax)
   const serviceCharge = restaurant?.settings?.serviceCharge ?? 0;
 
   const subtotal = React.useMemo(() => {
     return cartEntries.reduce((sum, item) => sum + Number(item.dish.price) * item.quantity, 0);
   }, [cartEntries]);
 
-  const taxAmount = Math.round((subtotal * (taxRate / 100) + Number.EPSILON) * 100) / 100;
   const serviceChargeAmount = Math.round((subtotal * (serviceCharge / 100) + Number.EPSILON) * 100) / 100;
-  const grandTotal = Math.round((subtotal + taxAmount + serviceChargeAmount + Number.EPSILON) * 100) / 100;
+  const grandTotal = Math.round((subtotal + serviceChargeAmount + Number.EPSILON) * 100) / 100;
 
   const handlePlaceOrder = async () => {
     if (cartEntries.length === 0) return;
@@ -101,6 +99,11 @@ export function CheckoutDrawer({
 
       if (!res.ok || !data.success) {
         throw new Error(data.message || "Failed to submit order. Please try again.");
+      }
+
+      // Save active order ID to localStorage for customer status tracking
+      if (typeof window !== "undefined") {
+        localStorage.setItem("active_order_id", data.data.id);
       }
 
       notify.success(`Order ${data.data.orderNumber} placed successfully!`);
@@ -239,7 +242,7 @@ export function CheckoutDrawer({
               <Label htmlFor="orderNotes" className="text-xs">Special Instructions</Label>
               <Textarea
                 id="orderNotes"
-                placeholder="e.g. Extra spicy Dalle dip, no cutlery required..."
+                placeholder="e.g. Extra spicy, no cutlery required..."
                 value={orderNotes}
                 onChange={(e) => setOrderNotes(e.target.value)}
                 rows={2}
@@ -248,7 +251,7 @@ export function CheckoutDrawer({
             </div>
           </div>
 
-          {/* Bill Summary Breakdown */}
+          {/* Bill Summary Breakdown (NO GST) */}
           <div className="space-y-2 border-t pt-4 text-xs">
             <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
               Payment Breakdown
@@ -257,11 +260,6 @@ export function CheckoutDrawer({
             <div className="flex justify-between text-muted-foreground">
               <span>Subtotal</span>
               <span className="font-semibold text-foreground">₹{subtotal.toLocaleString("en-IN")}</span>
-            </div>
-
-            <div className="flex justify-between text-muted-foreground">
-              <span>GST Tax ({taxRate}%)</span>
-              <span className="font-semibold text-foreground">₹{taxAmount.toLocaleString("en-IN")}</span>
             </div>
 
             {serviceCharge > 0 && (
