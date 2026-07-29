@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
 import { MediaService } from "@/services";
+import { getSession } from "@/lib/auth/session";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function DELETE(
   _request: Request,
   { params }: { params: { id: string } },
 ) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ success: false, message: "Unauthorized. Admin authentication required." }, { status: 401 });
+    }
+
     const { id } = params;
     await MediaService.deleteMediaAsset(id);
 

@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const restaurant =
+      (await RestaurantService.getRestaurant("smart-food-hub")) ||
       (await RestaurantService.getRestaurant("smart-tech-food-hub")) ||
       (await RestaurantService.getRestaurant("le-gourmet-bistro"));
 

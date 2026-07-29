@@ -130,7 +130,7 @@ export function CheckoutDrawer({
                 Your Table Order
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                {restaurant?.name || "Smart Tech Food Hub"}
+                {restaurant?.name || "Smart Food Hub"}
               </DialogDescription>
             </div>
 

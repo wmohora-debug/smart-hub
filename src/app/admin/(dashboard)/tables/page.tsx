@@ -758,7 +758,7 @@ export default function TablesAdminPage() {
               >
                 <div className="font-serif text-lg font-bold tracking-tight text-foreground flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-primary" />
-                  <span>Smart Tech Food Hub</span>
+                  <span>Smart Food Hub</span>
                 </div>
 
                 <div className="relative h-44 w-44 rounded-2xl border border-border/60 bg-white p-2 flex items-center justify-center">

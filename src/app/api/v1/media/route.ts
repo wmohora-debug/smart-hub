@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { MediaService, RestaurantService } from "@/services";
+import { getSession } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -13,6 +14,7 @@ export async function GET(request: Request) {
 
     if (!restaurantId) {
       const restaurant =
+        (await RestaurantService.getRestaurant("smart-food-hub")) ||
         (await RestaurantService.getRestaurant("smart-tech-food-hub")) ||
         (await RestaurantService.getRestaurant("le-gourmet-bistro"));
       restaurantId = restaurant?.id || null;
@@ -32,6 +34,11 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ success: false, message: "Unauthorized. Admin authentication required." }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const folder = (formData.get("folder") as string) || "general";
@@ -43,6 +50,7 @@ export async function POST(request: Request) {
 
     if (!restaurantId) {
       const restaurant =
+        (await RestaurantService.getRestaurant("smart-food-hub")) ||
         (await RestaurantService.getRestaurant("smart-tech-food-hub")) ||
         (await RestaurantService.getRestaurant("le-gourmet-bistro"));
       restaurantId = restaurant?.id || null;

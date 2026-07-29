@@ -19,7 +19,7 @@ export function HeroBanner({
   searchQuery = "",
   onSearchChange,
 }: HeroBannerProps) {
-  const displayName = restaurant?.name || "Smart Tech Food Hub";
+  const displayName = restaurant?.name || "Smart Food Hub";
   const displayTagline =
     restaurant?.tagline ||
     "Freshly prepared fast food, snacks, and refreshing drinks";
@@ -36,7 +36,7 @@ export function HeroBanner({
   const deliveryTime = restaurant?.deliveryTime || "30-45 min";
   const bannerUrl = restaurant?.banner;
 
-  // Extract initials (e.g., "Smart Tech Food Hub" -> "ST")
+  // Extract initials (e.g., "Smart Food Hub" -> "ST")
   const initials = displayName
     .split(" ")
     .map((word) => word[0])
@@ -94,7 +94,7 @@ export function HeroBanner({
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <h1 className="text-lg sm:text-2xl md:text-3xl font-serif font-bold tracking-tight text-white drop-shadow-md">
-                      Smart Tech Food Hub
+                      Smart Food Hub
                     </h1>
 
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-[10px] sm:text-[11px] font-medium shadow-sm">
@@ -145,7 +145,7 @@ export function HeroBanner({
               </Badge>
 
               <h2 className="text-base sm:text-xl md:text-2xl font-serif font-bold text-white tracking-tight leading-tight">
-                Smart Tech Food Hub
+                Smart Food Hub
               </h2>
 
               <p className="text-xs sm:text-sm text-white/85 max-w-xl leading-relaxed font-normal line-clamp-2 sm:line-clamp-none">

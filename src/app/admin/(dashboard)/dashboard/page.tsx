@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminDashboardPage() {
   const session = await getSession();
   let stats = {
-    restaurantName: "Smart Tech Food Hub",
+    restaurantName: "Smart Food Hub",
     categoryCount: 0,
     menuItemCount: 0,
     popularCount: 0,

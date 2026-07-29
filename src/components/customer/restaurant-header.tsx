@@ -26,7 +26,7 @@ export function RestaurantHeader({
   rating = "4.9 ★ (240+ Reviews)",
   location,
 }: RestaurantHeaderProps) {
-  const displayName = restaurant?.name || name || "Smart Tech Food Hub";
+  const displayName = restaurant?.name || name || "Smart Food Hub";
   const displayTagline =
     restaurant?.tagline ||
     tagline ||
@@ -45,7 +45,7 @@ export function RestaurantHeader({
       ? false
       : restaurant?.isActive ?? true;
 
-  // Extract initials (e.g., "Smart Tech Food Hub" -> "ST")
+  // Extract initials (e.g., "Smart Food Hub" -> "SF")
   const initials = displayName
     .split(" ")
     .map((word) => word[0])

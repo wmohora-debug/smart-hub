@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 import { OrderService } from "@/services";
+import { getSession } from "@/lib/auth/session";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(
   _request: Request,
@@ -24,6 +28,11 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ success: false, message: "Unauthorized. Admin authentication required." }, { status: 401 });
+    }
+
     const { id } = params;
     await OrderService.deleteOrder(id);
 

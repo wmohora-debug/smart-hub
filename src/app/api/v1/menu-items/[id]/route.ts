@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
 import { MenuService } from "@/services";
+import { getSession } from "@/lib/auth/session";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } },
 ) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ success: false, message: "Unauthorized. Admin authentication required." }, { status: 401 });
+    }
+
     const { id } = params;
     const body = await request.json();
 
@@ -39,6 +48,11 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ success: false, message: "Unauthorized. Admin authentication required." }, { status: 401 });
+    }
+
     const { id } = params;
     const body = await request.json();
     const { property, value } = body;
@@ -69,6 +83,11 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return NextResponse.json({ success: false, message: "Unauthorized. Admin authentication required." }, { status: 401 });
+    }
+
     const { id } = params;
     await MenuService.hardDeleteMenuItem(id);
 

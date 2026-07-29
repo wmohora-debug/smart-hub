@@ -13,6 +13,7 @@ export default async function CustomerPage() {
 
   try {
     const fetchedRestaurant =
+      (await RestaurantService.getRestaurant("smart-food-hub")) ||
       (await RestaurantService.getRestaurant("smart-tech-food-hub")) ||
       (await RestaurantService.getRestaurant("le-gourmet-bistro"));
 

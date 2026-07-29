@@ -5,32 +5,56 @@ interface SessionPayload {
   userId: string;
   email: string;
   role: string;
+  restaurantId?: string | null;
   expiresAt: number;
 }
 
-function parseSessionToken(token: string): SessionPayload | null {
+const AUTH_SECRET = process.env.AUTH_SECRET || "smart-menu-namchi-enterprise-secret-key-2026";
+
+async function verifySessionTokenEdge(token: string): Promise<SessionPayload | null> {
   try {
     if (!token || !token.includes(".")) return null;
-    const [data] = token.split(".");
+    const [data, signature] = token.split(".");
+
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encoder.encode(AUTH_SECRET),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"],
+    );
+
+    const sigBuffer = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
+    const sigArray = Array.from(new Uint8Array(sigBuffer));
+    const expectedSig = btoa(String.fromCharCode(...sigArray))
+      .replace(/=/g, "")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_");
+
+    if (signature !== expectedSig) return null;
+
     const base64 = data.replace(/-/g, "+").replace(/_/g, "/");
     const jsonStr = atob(base64);
     const payload: SessionPayload = JSON.parse(jsonStr);
-    if (payload && typeof payload.expiresAt === "number" && Date.now() < payload.expiresAt) {
-      return payload;
+
+    if (!payload || typeof payload.expiresAt !== "number" || Date.now() > payload.expiresAt) {
+      return null;
     }
-    return null;
+
+    return payload;
   } catch {
     return null;
   }
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Protect all /admin routes
   if (pathname.startsWith("/admin")) {
     const sessionCookie = request.cookies.get("admin_session")?.value;
-    const session = sessionCookie ? parseSessionToken(sessionCookie) : null;
+    const session = sessionCookie ? await verifySessionTokenEdge(sessionCookie) : null;
 
     // 1. Root /admin -> redirect to dashboard or login
     if (pathname === "/admin" || pathname === "/admin/") {
@@ -38,7 +62,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(target, request.url));
     }
 
-    // 2. Unauthenticated user visiting protected admin route -> redirect to login
+    // 2. Unauthenticated user visiting protected admin route -> redirect to login immediately
     if (!session && pathname !== "/admin/login") {
       const loginUrl = new URL("/admin/login", request.url);
       loginUrl.searchParams.set("from", pathname);

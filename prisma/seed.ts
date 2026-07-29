@@ -11,47 +11,58 @@ function hashPassword(password: string): string {
 }
 
 async function main() {
-  console.log("🌱 Starting Smart Tech Food Hub Database Seed (Safe & Idempotent)...");
+  console.log("🌱 Starting Smart Food Hub Database Seed (Safe & Idempotent)...");
 
   // 1. Seed Restaurant Entity (Non-Destructive: Never overwrite uploaded banner or logo)
-  const restaurant = await prisma.restaurant.upsert({
-    where: { slug: "smart-tech-food-hub" },
-    update: {
-      // Do NOT overwrite existing logo or banner!
+  const existingRestaurant = await prisma.restaurant.findFirst({
+    where: {
+      OR: [{ slug: "smart-food-hub" }, { slug: "smart-tech-food-hub" }],
     },
-    create: {
-      slug: "smart-tech-food-hub",
-      name: "Smart Tech Food Hub",
-      tagline: "Premium Artisanal Digital Menu & Culinary Bistro",
-      description: "Premium Artisanal Digital Menu & Culinary Bistro by Smart Tech Namchi",
-      longDescription: "Smart Tech Food Hub is Namchi's premier dining destination, offering an exquisite fusion of local Himalayan flavors and continental fine dining.",
-      address: "Smart Tech Namchi Central, Namchi, Sikkim",
-      city: "Namchi",
-      state: "Sikkim",
-      country: "India",
-      postalCode: "737126",
-      phone: "+91 98000 12345",
-      whatsapp: "+91 98000 12345",
-      email: "contact@smarttechfoodhub.com",
-      website: "https://smarttechfoodhub.com",
-      logo: "/images/logo-placeholder.png",
-      banner: "/images/banner-placeholder.png",
-      favicon: "/favicon.ico",
-      themeColor: "#D97706",
-      openingTime: "10:00 AM",
-      closingTime: "10:30 PM",
-      autoOpen: true,
-      isOverrideClosed: false,
-      prepTime: "15-20 min",
-      deliveryTime: "30-45 min",
-      facebookUrl: "https://facebook.com/smarttechfoodhub",
-      instagramUrl: "https://instagram.com/smarttechfoodhub",
-      twitterUrl: "https://twitter.com/smarttechfoodhub",
-      youtubeUrl: "https://youtube.com/@smarttechfoodhub",
-      googleMapsUrl: "https://maps.google.com/?q=Smart+Tech+Namchi",
-      metaTitle: "Smart Tech Food Hub — Artisanal Digital Menu & Bistro",
-      metaDescription: "Explore our hand-crafted menu prepared by master chefs using organic, locally sourced ingredients from Namchi Valley.",
-      keywords: "Smart Tech, Namchi, Restaurant, Digital Menu, Momos, Pizza, Fine Dining",
+  });
+
+  const restaurant = existingRestaurant
+    ? await prisma.restaurant.update({
+        where: { id: existingRestaurant.id },
+        data: {
+          name: "Smart Food Hub",
+          slug: "smart-food-hub",
+          metaTitle: "Smart Food Hub — Artisanal Digital Menu & Bistro",
+        },
+      })
+    : await prisma.restaurant.create({
+        data: {
+          slug: "smart-food-hub",
+          name: "Smart Food Hub",
+          tagline: "Premium Artisanal Digital Menu & Culinary Bistro",
+          description: "Premium Artisanal Digital Menu & Culinary Bistro by Smart Tech Namchi",
+          longDescription: "Smart Food Hub is Namchi's premier dining destination, offering an exquisite fusion of local Himalayan flavors and continental fine dining.",
+          address: "Smart Tech Namchi Central, Namchi, Sikkim",
+          city: "Namchi",
+          state: "Sikkim",
+          country: "India",
+          postalCode: "737126",
+          phone: "+91 98000 12345",
+          whatsapp: "+91 98000 12345",
+          email: "contact@smartfoodhub.com",
+          website: "https://smartfoodhub.com",
+          logo: "/images/logo-placeholder.png",
+          banner: "/images/banner-placeholder.png",
+          favicon: "/favicon.ico",
+          themeColor: "#D97706",
+          openingTime: "10:00 AM",
+          closingTime: "10:30 PM",
+          autoOpen: true,
+          isOverrideClosed: false,
+          prepTime: "15-20 min",
+          deliveryTime: "30-45 min",
+          facebookUrl: "https://facebook.com/smartfoodhub",
+          instagramUrl: "https://instagram.com/smartfoodhub",
+          twitterUrl: "https://twitter.com/smartfoodhub",
+          youtubeUrl: "https://youtube.com/@smartfoodhub",
+          googleMapsUrl: "https://maps.google.com/?q=Smart+Tech+Namchi",
+          metaTitle: "Smart Food Hub — Artisanal Digital Menu & Bistro",
+          metaDescription: "Explore our hand-crafted menu prepared by master chefs using organic, locally sourced ingredients from Namchi Valley.",
+          keywords: "Smart Food Hub, Smart Tech, Namchi, Restaurant, Digital Menu, Momos, Pizza, Fine Dining",
       currency: "INR",
       timezone: "Asia/Kolkata",
       openingHours: {
@@ -86,7 +97,7 @@ async function main() {
       serviceCharge: 0.0,
       currency: "INR",
       themeConfig: { accent: "gold", border: "warm-stone" },
-      brandingJson: { headerTitle: "Smart Tech Food Hub", footerTagline: "Smart Tech Namchi" },
+      brandingJson: { headerTitle: "Smart Food Hub", footerTagline: "Smart Tech Namchi" },
     },
   });
 

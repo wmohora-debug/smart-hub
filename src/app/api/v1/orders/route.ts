@@ -12,6 +12,7 @@ export async function GET(request: Request) {
 
     if (!restaurantId) {
       const restaurant =
+        (await RestaurantService.getRestaurant("smart-food-hub")) ||
         (await RestaurantService.getRestaurant("smart-tech-food-hub")) ||
         (await RestaurantService.getRestaurant("le-gourmet-bistro"));
       if (!restaurant) {
@@ -62,6 +63,7 @@ export async function POST(request: Request) {
     let restaurantId = body.restaurantId;
     if (!restaurantId) {
       const restaurant =
+        (await RestaurantService.getRestaurant("smart-food-hub")) ||
         (await RestaurantService.getRestaurant("smart-tech-food-hub")) ||
         (await RestaurantService.getRestaurant("le-gourmet-bistro"));
       if (!restaurant) {
